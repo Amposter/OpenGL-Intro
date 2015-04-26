@@ -3,6 +3,7 @@
 
 #include "glheaders.h" // Must be included before QT opengl headers
 #include <QGLWidget>
+#include <QWheelEvent>
 
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
@@ -11,7 +12,9 @@ class GLWidget : public QGLWidget
 {
     Q_OBJECT
 public:
-    GLWidget( const QGLFormat& format, QWidget* parent = 0 );
+    GLWidget(const QGLFormat& format, QWidget* parent = 0);
+public slots:
+    void wheelEvent(QWheelEvent *event);
 
 protected:
     virtual void initializeGL();

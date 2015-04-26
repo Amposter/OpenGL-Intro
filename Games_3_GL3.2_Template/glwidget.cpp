@@ -7,6 +7,7 @@
 #include <fstream>
 #include <QFile>
 #include <QFileDevice>
+#include <QWheelEvent>
 
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
@@ -15,9 +16,17 @@
 #define FRAG_SHADER ":/simple.frag"
 
 using namespace std;
-
 unsigned int numTriangles; //Number of triangles
 float r,g,b;
+
+glm::mat4x4 viewMatrix;
+glm::mat4 projectionMatrix;
+glm::mat4 modelMatrix;
+glm::mat4 mvp;
+
+char translation;
+glm::vec3 axis;
+
 GLWidget::GLWidget( const QGLFormat& format, QWidget* parent )
     : QGLWidget( format, parent ),
       m_vertexBuffer( QOpenGLBuffer::VertexBuffer )
@@ -44,7 +53,7 @@ void GLWidget::initializeGL()
     ifstream ifs("bunny.stl", ios::binary | ios::in);
     char header[80];
     char num[4];
-    ifs.read(header, 80);
+    ifs.read(header, 80);(0.0f,0.0f,1.0f);
     ifs.read(num,4);
     numTriangles =  *((unsigned int *)num);
 
@@ -158,24 +167,34 @@ void GLWidget::initializeGL()
 
     glm::vec3 eye(0,0,1);
     glm::vec3 cent(0,0,0);
-    //glm::vec3 cent = glm::normalize(eye-target);
     glm::vec3 up(0,1,0);
 
-    glm::mat4x4 viewMatrix = glm::lookAt(eye,cent,up);
-    glm::mat4 projectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
+    viewMatrix = glm::lookAt(eye,cent,up);
+    projectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    modelMatrix = glm::mat4(1.0f);
+
+    axis = glm::vec3(1.0f,0.0f,0.0f);
+    translation = 'R';
     //modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.25f,0.0f));
     //modelMatrix = glm::rotate(modelMatrix,55.0f,glm::vec3(0.0f,0.0f,1.0f));
-    modelMatrix = glm::scale(modelMatrix,glm::vec3(1.0f,-2.0f,1.0f));
-    for (int i = 0;i < 4; i++)
-    {
-        for (int j = 0; j < 4; j ++)
-            cout << modelMatrix[i][j] << " ";
-        cout << endl;
-    }
-
-    glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
+    //modelMatrix = glm::scale(modelMatrix,glm::vec3(1.0f,-2.0f,1.0f));
+    mvp = projectionMatrix * viewMatrix * modelMatrix;
     glUniformMatrix4fv(glGetUniformLocation(m_shader.programId(),"mvp"), 1, GL_FALSE, &mvp[0][0]);
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    int numDegrees = event->delta()/20;
+    if (translation == 'R')
+        modelMatrix = glm::rotate(modelMatrix,(float)numDegrees,axis);
+    else if (translation == 'S')
+        modelMatrix = glm::scale(modelMatrix,axis*((float)numDegrees/15));
+    else \
+        modelMatrix = glm::translate(glm::mat4(1.0f), axis*(0.05f*numDegrees));
+    mvp = projectionMatrix * viewMatrix * modelMatrix;
+    glUniformMatrix4fv(glGetUniformLocation(m_shader.programId(),"mvp"), 1, GL_FALSE, &mvp[0][0]);
+    updateGL();
+
 }
 
 void GLWidget::resizeGL( int w, int h )
@@ -226,6 +245,53 @@ void GLWidget::keyPressEvent( QKeyEvent* e )
             g = 0.0f;
             b = 0.5f;
             break;
+        case Qt::Key_R:
+
+            if (translation != 'R')
+            {
+                axis = glm::vec3(1.0f,0.0f,0.0f);
+                translation = 'R';
+            }
+            else
+            {
+                if (axis == glm::vec3(1.0f,0.0f,0.0f))
+                    axis = glm::vec3(0.0f,1.0f,0.0f);
+                else if (axis == glm::vec3(0.0f,1.0f,0.0f))
+                    axis = glm::vec3(0.0f,0.0f,1.0f);
+                else
+                    axis = glm::vec3(1.0f,0.0f,0.0f);
+            }
+        case Qt::Key_S:
+            translation = 'S';
+            if (translation != 'S')
+            {
+                axis = glm::vec3(1.0f,0.0f,0.0f);
+            }
+            else
+            {
+                if (axis == glm::vec3(1.0f,0.0f,0.0f))
+                    axis = glm::vec3(0.0f,1.0f,0.0f);
+                else if (axis == glm::vec3(0.0f,1.0f,0.0f))
+                    axis = glm::vec3(0.0f,0.0f,1.0f);
+                else
+                    axis = glm::vec3(1.0f,0.0f,0.0f);
+            }
+        case Qt::Key_T:
+            translation = 'T';
+            if (translation != 'T')
+            {
+                axis = glm::vec3(1.0f,0.0f,0.0f);
+            }
+            else
+            {
+                if (axis == glm::vec3(1.0f,0.0f,0.0f))
+                    axis = glm::vec3(0.0f,1.0f,0.0f);
+                else if (axis == glm::vec3(0.0f,1.0f,0.0f))
+                    axis = glm::vec3(0.0f,0.0f,1.0f);
+                else
+                    axis = glm::vec3(1.0f,0.0f,0.0f);
+            }
+
 
         default:
             QGLWidget::keyPressEvent( e );
