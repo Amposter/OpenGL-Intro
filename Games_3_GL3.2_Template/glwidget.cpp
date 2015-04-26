@@ -155,6 +155,27 @@ void GLWidget::initializeGL()
     m_shader.setAttributeBuffer( "vertex", GL_FLOAT, 0, 4 );
     m_shader.enableAttributeArray( "vertex" );
     glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),r,g,b,1.0f);
+
+    glm::vec3 eye(0,0,1);
+    glm::vec3 cent(0,0,0);
+    //glm::vec3 cent = glm::normalize(eye-target);
+    glm::vec3 up(0,1,0);
+
+    glm::mat4x4 viewMatrix = glm::lookAt(eye,cent,up);
+    glm::mat4 projectionMatrix = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
+    //modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,0.25f,0.0f));
+    //modelMatrix = glm::rotate(modelMatrix,55.0f,glm::vec3(0.0f,0.0f,1.0f));
+    modelMatrix = glm::scale(modelMatrix,glm::vec3(1.0f,-2.0f,1.0f));
+    for (int i = 0;i < 4; i++)
+    {
+        for (int j = 0; j < 4; j ++)
+            cout << modelMatrix[i][j] << " ";
+        cout << endl;
+    }
+
+    glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
+    glUniformMatrix4fv(glGetUniformLocation(m_shader.programId(),"mvp"), 1, GL_FALSE, &mvp[0][0]);
 }
 
 void GLWidget::resizeGL( int w, int h )
@@ -163,20 +184,11 @@ void GLWidget::resizeGL( int w, int h )
     glViewport( 0, 0, w, qMax( h, 1 ) );
 }
 
-GLdouble eyeX = 0, eyeY = 0, eyeZ = 2;
-GLdouble centerX = 0, centerY = 0, centerZ = 0;
-GLdouble upX = 0, upY = 1, upZ = 0;
-
 void GLWidget::paintGL()
 {
 
     // Clear the buffer with the current clearing color
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    glMatrixMode (GL_MODELVIEW);
-    /*gluLookAt (eyeX, eyeY, eyeZ,
-                  centerX, centerY, centerZ,
-                  upX, upY, upZ);*/
 
     // Draw stuff
    glDrawArrays( GL_TRIANGLES, 0, numTriangles*3);
