@@ -1,0 +1,29 @@
+Author: Aashiq Parker, PRKAAS003
+Date: 2015/ 04/ 27
+
+CSC3020H Practical Assignment 2: OpenGL Bootcamp
+
+Hello,
+
+When you run the project the first time, you'll be presented with a blank screen.
+
+You can use the 'Open' menu option under 'File' to load the bunny.stl which was provided. There is also
+a second .stl that was included for testing purposes so you can go ahead and open that too if you want.
+
+What the 'New' button is supposed to do was not specified, so the option reloads the current .stl file
+i.e it undoes any transformations the user has applied to it.
+
+The keys to use the transformations are 'R' for rotate, 'S' to scale and 'T' for translate. So you click
+a transformation key and you are in that mode and can transform the object by using the mouse wheel scroller thingy. If you click the same transformation key again it will switch the axis (from x to y, y to z or z to x). Clicking a different transformation key will simply switch to that mode.
+
+The keys '1'-'5' are used to change the color of the objects.
+
+When you open the bunny, you'll notice its kinda far away. No specification was given as to where the 'camera' should be so I placed it a bit far away so that you could also load bigger images, like the 
+pump I included. But you can just zoom in by pressing 'T' thrice to change the transformation mode to
+translate in the z-axis and scroll up to bring it closer to you.
+
+The maths library that was used is glm, as recommended by the lecturers/TA. It is included in the debug folder, however I'm not sure if you would have to run some commands to install it on you're machine, as this was already installed on the labs' PC's.
+
+I think I covered everything I needed to, if anything is needed email at PRKAAS003@myuct.ac.za
+
+Happy marking :)
