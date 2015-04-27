@@ -26,6 +26,9 @@ glm::mat4 mvp;
 
 char translation;
 glm::vec3 axis;
+glm::vec3 x(1.0f,0.0f,0.0f);
+glm::vec3 y(0.0f,1.0f,0.0f);
+glm::vec3 z(0.0f,0.0f,1.0f);
 
 GLWidget::GLWidget( const QGLFormat& format, QWidget* parent )
     : QGLWidget( format, parent ),
@@ -188,9 +191,9 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     if (translation == 'R')
         modelMatrix = glm::rotate(modelMatrix,(float)numDegrees,axis);
     else if (translation == 'S')
-        modelMatrix = glm::scale(modelMatrix,axis*((float)numDegrees/15));
-    else \
-        modelMatrix = glm::translate(glm::mat4(1.0f), axis*(0.05f*numDegrees));
+        modelMatrix = glm::scale(modelMatrix, (axis*(float)numDegrees/25.0f) + glm::vec3(1.0f));
+    else if (translation == 'T')
+        modelMatrix *= glm::translate(glm::mat4(1.0f), axis*(0.005f*numDegrees));
     mvp = projectionMatrix * viewMatrix * modelMatrix;
     glUniformMatrix4fv(glGetUniformLocation(m_shader.programId(),"mvp"), 1, GL_FALSE, &mvp[0][0]);
     updateGL();
@@ -246,59 +249,39 @@ void GLWidget::keyPressEvent( QKeyEvent* e )
             b = 0.5f;
             break;
         case Qt::Key_R:
-
-            if (translation != 'R')
-            {
-                axis = glm::vec3(1.0f,0.0f,0.0f);
-                translation = 'R';
-            }
-            else
-            {
-                if (axis == glm::vec3(1.0f,0.0f,0.0f))
-                    axis = glm::vec3(0.0f,1.0f,0.0f);
-                else if (axis == glm::vec3(0.0f,1.0f,0.0f))
-                    axis = glm::vec3(0.0f,0.0f,1.0f);
-                else
-                    axis = glm::vec3(1.0f,0.0f,0.0f);
-            }
+            transform('R');
+            break;
         case Qt::Key_S:
-            translation = 'S';
-            if (translation != 'S')
-            {
-                axis = glm::vec3(1.0f,0.0f,0.0f);
-            }
-            else
-            {
-                if (axis == glm::vec3(1.0f,0.0f,0.0f))
-                    axis = glm::vec3(0.0f,1.0f,0.0f);
-                else if (axis == glm::vec3(0.0f,1.0f,0.0f))
-                    axis = glm::vec3(0.0f,0.0f,1.0f);
-                else
-                    axis = glm::vec3(1.0f,0.0f,0.0f);
-            }
+            transform('S');
+            break;
         case Qt::Key_T:
-            translation = 'T';
-            if (translation != 'T')
-            {
-                axis = glm::vec3(1.0f,0.0f,0.0f);
-            }
-            else
-            {
-                if (axis == glm::vec3(1.0f,0.0f,0.0f))
-                    axis = glm::vec3(0.0f,1.0f,0.0f);
-                else if (axis == glm::vec3(0.0f,1.0f,0.0f))
-                    axis = glm::vec3(0.0f,0.0f,1.0f);
-                else
-                    axis = glm::vec3(1.0f,0.0f,0.0f);
-            }
-
-
+            transform('T');
+            break;
         default:
             QGLWidget::keyPressEvent( e );
     }
 
     glUniform4f(glGetUniformLocation(m_shader.programId(),"fcolor"),r,g,b,1.0f);
     updateGL();
+}
+
+void transform(char type)
+{
+    if (translation != type)
+    {
+        translation = type;
+        axis = x;
+    }
+    else
+    {
+        if (axis == x)
+            axis = y;
+        else if (axis == y)
+            axis = z;
+        else if (axis == z)
+            axis = x;
+    }
+
 }
 
 bool GLWidget::prepareShaderProgram( const QString& vertexShaderPath,

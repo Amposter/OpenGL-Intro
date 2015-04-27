@@ -4,9 +4,12 @@
 #include "glheaders.h" // Must be included before QT opengl headers
 #include <QGLWidget>
 #include <QWheelEvent>
+#include <string>
 
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
+
+void transform(char type);
 
 class GLWidget : public QGLWidget
 {
