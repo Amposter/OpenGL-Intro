@@ -10,6 +10,7 @@
 #include <QOpenGLShaderProgram>
 
 void transform(char type);
+void drawSTL(std::string filename);
 
 class GLWidget : public QGLWidget
 {
@@ -18,6 +19,8 @@ public:
     GLWidget(const QGLFormat& format, QWidget* parent = 0);
 public slots:
     void wheelEvent(QWheelEvent *event);
+    void openFile(void);
+    void newFile(void);
 
 protected:
     virtual void initializeGL();
